@@ -1,0 +1,89 @@
+function find_route(start, destination, route, distance, road_condition, condition_value):
+    if start is equal to destination:
+        path = join route with ' -> '
+        return [(path, distance, road_condition, condition_value)]
+
+    results = []
+    for city in distance[start]:
+        if city is not in route:
+            city_distance = distance[start][city]
+            city_condition = road_condition[start][city]
+
+            route.append(city)
+            distance += city_distance
+            road_condition += "-" + city_condition
+            condition_value += condition_mapping[road_condition[start][city]]
+
+            results.extend(find_route(city, destination, route, distance, road_condition, condition_value))
+
+            route.pop()
+            distance -= city_distance
+            road_condition = road_condition[:-len(city_condition)-1]
+            condition_value -= condition_mapping[road_condition[start][city]]
+
+    return results
+
+start = input("Masukkan titik asal: ")
+destination = input("Masukkan titik tujuan: ")
+
+travel_results = find_route(start, destination, [start], 0, '', 0)
+
+if not travel_results:
+    print("Tidak ada rute yang tersedia.")
+else:
+    paths = []
+    distances = []
+    road_conditions = []
+    condition_values = []
+
+    for result in travel_results:
+        paths.append(result[0])
+        distances.append(result[1])
+        road_conditions.append(result[2])
+        condition_values.append(result[3])
+
+    best_condition_index = condition_values.index(min(condition_values))
+    shortest_distance_index = distances.index(min(distances))
+
+    if best_condition_index == shortest_distance_index or 
+    distances[best_condition_index] == distances[shortest_distance_index]:
+        print("Rute Terbaik:")
+        print("Rute:", paths[best_condition_index])
+        print("Jarak Tempuh:", distances[best_condition_index], "km")
+        print("Kondisi Jalan:", road_conditions[best_condition_index])
+        print()
+    else if condition_values[best_condition_index] == condition_values[shortest_distance_index]:
+        print("Rute Terbaik:")
+        print("Rute:", paths[shortest_distance_index])
+        print("Jarak Tempuh:", distances[shortest_distance_index], "km")
+        print("Kondisi Jalan:", road_conditions[shortest_distance_index])
+        print()
+    else:
+        print("Rute Kondisi Terbaik:")
+        print("Rute:", paths[best_condition_index])
+        print("Jarak Tempuh:", distances[best_condition_index], "km")
+        print("Kondisi Jalan:", road_conditions[best_condition_index])
+        print()
+        print("Rute Jarak Terpendek:")
+        print("Rute:", paths[shortest_distance_index])
+        print("Jarak Tempuh:", distances[shortest_distance_index], "km")
+        print("Kondisi Jalan:", road_conditions[shortest_distance_index])
+        print()
+
+    recommendation_count = 0
+    for j in range(len(travel_results)):
+        if recommendation_count < 4 and 
+	  distances[j] > distances[shortest_distance_index] and 
+	  distances[j] < distances[shortest_distance_index] + 6 and 
+	  condition_values[j] > condition_values[best_condition_index] and 
+	  condition_values[j] < condition_values[best_condition_index] + 3:
+
+            recommendation_count += 1
+            print("Rute Rekomendasi Alternatif:")
+            print("Rute:", paths[j])
+            print("Jarak Tempuh:", distances[j], "km")
+            print("Kondisi Jalan:", road_conditions[j])
+            print()
+
+    if recommendation_count == 0:
+        print("Tidak ada rute rekomendasi alternatif.")
